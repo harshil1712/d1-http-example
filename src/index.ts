@@ -13,8 +13,8 @@ import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 
 type Bindings = {
-	DB: D1Database;
 	API_KEY: string;
+	DB: D1Database;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -23,6 +23,11 @@ app.use('*', prettyJSON(), logger(), async (c, next) => {
 	const auth = bearerAuth({ token: c.env.API_KEY });
 	return auth(c, next);
 });
+
+/**
+ * Execute the `stmt.all()` method.
+ * https://developers.cloudflare.com/d1/build-with-d1/d1-client-api/#await-stmtall
+ */
 
 app.post('/api/all', async (c) => {
 	try {
@@ -39,6 +44,11 @@ app.post('/api/all', async (c) => {
 	}
 });
 
+/**
+ * Execute the `db.exec()` method.
+ * https://developers.cloudflare.com/d1/build-with-d1/d1-client-api/#await-dbexec
+ */
+
 app.post('/api/exec', async (c) => {
 	try {
 		let { query } = await c.req.json();
@@ -48,6 +58,11 @@ app.post('/api/exec', async (c) => {
 		return c.json({ error: `Failed to run query: ${err}` }, 500);
 	}
 });
+
+/**
+ * Execute the `db.batch()` method.
+ * https://developers.cloudflare.com/d1/build-with-d1/d1-client-api/#dbbatch
+ */
 
 app.post('/api/batch', async (c) => {
 	try {
